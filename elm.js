@@ -4066,44 +4066,99 @@ Elm.Logo.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Svg = Elm.Svg.make(_elm),
    $Svg$Attributes = Elm.Svg.Attributes.make(_elm);
-   var logo = A2($Svg.svg,
-   _L.fromArray([$Svg$Attributes.version("1.1")
-                ,$Svg$Attributes.x("0")
-                ,$Svg$Attributes.y("0")
-                ,$Svg$Attributes.viewBox("0 0 323.141 322.95")]),
-   _L.fromArray([A2($Svg.polygon,
-                _L.fromArray([$Svg$Attributes.fill("#F0AD00")
-                             ,$Svg$Attributes.points("161.649,152.782 231.514,82.916 91.783,82.916")]),
-                _L.fromArray([]))
-                ,A2($Svg.polygon,
-                _L.fromArray([$Svg$Attributes.fill("#7FD13B")
-                             ,$Svg$Attributes.points("8.867,0 79.241,70.375 232.213,70.375 161.838,0")]),
-                _L.fromArray([]))
-                ,A2($Svg.rect,
-                _L.fromArray([$Svg$Attributes.fill("#7FD13B")
-                             ,$Svg$Attributes.x("192.99")
-                             ,$Svg$Attributes.y("107.392")
-                             ,$Svg$Attributes.width("107.676")
-                             ,$Svg$Attributes.height("108.167")
-                             ,$Svg$Attributes.transform("matrix(0.7071 0.7071 -0.7071 0.7071 186.4727 -127.2386)")]),
-                _L.fromArray([]))
-                ,A2($Svg.polygon,
-                _L.fromArray([$Svg$Attributes.fill("#60B5CC")
-                             ,$Svg$Attributes.points("323.298,143.724 323.298,0 179.573,0")]),
-                _L.fromArray([]))
-                ,A2($Svg.polygon,
-                _L.fromArray([$Svg$Attributes.fill("#5A6378")
-                             ,$Svg$Attributes.points("152.781,161.649 0,8.868 0,314.432")]),
-                _L.fromArray([]))
-                ,A2($Svg.polygon,
-                _L.fromArray([$Svg$Attributes.fill("#F0AD00")
-                             ,$Svg$Attributes.points("255.522,246.655 323.298,314.432 323.298,178.879")]),
-                _L.fromArray([]))
-                ,A2($Svg.polygon,
-                _L.fromArray([$Svg$Attributes.fill("#60B5CC")
-                             ,$Svg$Attributes.points("161.649,170.517 8.869,323.298 314.43,323.298")]),
-                _L.fromArray([]))]));
+   var Blue = {ctor: "Blue"};
+   var Purple = {ctor: "Purple"};
+   var Yellow = {ctor: "Yellow"};
+   var Green = {ctor: "Green"};
+   var HBlue = {ctor: "HBlue"};
+   var HPurple = {ctor: "HPurple"};
+   var HYellow = {ctor: "HYellow"};
+   var HGreen = {ctor: "HGreen"};
+   var colour = F2(function (colour,
+   highlight) {
+      return function () {
+         switch (colour.ctor)
+         {case "Blue":
+            return _U.eq(highlight,
+              HBlue) ? "#38d4ff" : "#60B5CC";
+            case "Green":
+            return _U.eq(highlight,
+              HGreen) ? "#8cfe2f" : "#7FD13B";
+            case "Purple":
+            return _U.eq(highlight,
+              HPurple) ? "#3b3b97" : "#5A6378";
+            case "Yellow":
+            return _U.eq(highlight,
+              HYellow) ? "#ffc229" : "#F0AD00";}
+         _U.badCase($moduleName,
+         "between lines 24 and 32");
+      }();
+   });
+   var logo = function (highlight) {
+      return A2($Svg.svg,
+      _L.fromArray([$Svg$Attributes.version("1.1")
+                   ,$Svg$Attributes.x("0")
+                   ,$Svg$Attributes.y("0")
+                   ,$Svg$Attributes.viewBox("0 0 323.141 322.95")]),
+      _L.fromArray([A2($Svg.polygon,
+                   _L.fromArray([$Svg$Attributes.fill(A2(colour,
+                                Yellow,
+                                highlight))
+                                ,$Svg$Attributes.points("161.649,152.782 231.514,82.916 91.783,82.916")]),
+                   _L.fromArray([]))
+                   ,A2($Svg.polygon,
+                   _L.fromArray([$Svg$Attributes.fill(A2(colour,
+                                Green,
+                                highlight))
+                                ,$Svg$Attributes.points("8.867,0 79.241,70.375 232.213,70.375 161.838,0")]),
+                   _L.fromArray([]))
+                   ,A2($Svg.rect,
+                   _L.fromArray([$Svg$Attributes.fill(A2(colour,
+                                Green,
+                                highlight))
+                                ,$Svg$Attributes.x("192.99")
+                                ,$Svg$Attributes.y("107.392")
+                                ,$Svg$Attributes.width("107.676")
+                                ,$Svg$Attributes.height("108.167")
+                                ,$Svg$Attributes.transform("matrix(0.7071 0.7071 -0.7071 0.7071 186.4727 -127.2386)")]),
+                   _L.fromArray([]))
+                   ,A2($Svg.polygon,
+                   _L.fromArray([$Svg$Attributes.fill(A2(colour,
+                                Blue,
+                                highlight))
+                                ,$Svg$Attributes.points("323.298,143.724 323.298,0 179.573,0")]),
+                   _L.fromArray([]))
+                   ,A2($Svg.polygon,
+                   _L.fromArray([$Svg$Attributes.fill(A2(colour,
+                                Purple,
+                                highlight))
+                                ,$Svg$Attributes.points("152.781,161.649 0,8.868 0,314.432")]),
+                   _L.fromArray([]))
+                   ,A2($Svg.polygon,
+                   _L.fromArray([$Svg$Attributes.fill(A2(colour,
+                                Yellow,
+                                highlight))
+                                ,$Svg$Attributes.points("255.522,246.655 323.298,314.432 323.298,178.879")]),
+                   _L.fromArray([]))
+                   ,A2($Svg.polygon,
+                   _L.fromArray([$Svg$Attributes.fill(A2(colour,
+                                Blue,
+                                highlight))
+                                ,$Svg$Attributes.points("161.649,170.517 8.869,323.298 314.43,323.298")]),
+                   _L.fromArray([]))]));
+   };
+   var None = {ctor: "None"};
    _elm.Logo.values = {_op: _op
+                      ,None: None
+                      ,HGreen: HGreen
+                      ,HYellow: HYellow
+                      ,HPurple: HPurple
+                      ,HBlue: HBlue
+                      ,Green: Green
+                      ,Yellow: Yellow
+                      ,Purple: Purple
+                      ,Blue: Blue
+                      ,colour: colour
                       ,logo: logo};
    return _elm.Logo.values;
 };
@@ -4125,7 +4180,8 @@ Elm.Main.make = function (_elm) {
    $Logo = Elm.Logo.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   $Signal = Elm.Signal.make(_elm),
+   $Time = Elm.Time.make(_elm);
    var svgpanel = $Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
                                                        ,_0: "width"
                                                        ,_1: "500px"}
@@ -4141,16 +4197,55 @@ Elm.Main.make = function (_elm) {
                                                        ,{ctor: "_Tuple2"
                                                         ,_0: "margin-top"
                                                         ,_1: "40px"}]));
-   var main = A2($Html.div,
-   _L.fromArray([mainpanel]),
-   _L.fromArray([A2($Html.h1,
-                _L.fromArray([]),
-                _L.fromArray([$Html.text("Simon Says")]))
-                ,A2($Html.div,
-                _L.fromArray([svgpanel]),
-                _L.fromArray([$Logo.logo]))]));
+   var renderBoard = function (highlight) {
+      return A2($Html.div,
+      _L.fromArray([mainpanel]),
+      _L.fromArray([A2($Html.h1,
+                   _L.fromArray([]),
+                   _L.fromArray([$Html.text("Simon Says")]))
+                   ,A2($Html.div,
+                   _L.fromArray([svgpanel]),
+                   _L.fromArray([$Logo.logo(highlight)]))]));
+   };
+   var renderGameState = function (gameState) {
+      return function () {
+         var currentHighlight = A2($Maybe.withDefault,
+         $Logo.None,
+         $List.head(gameState.sequence));
+         return renderBoard(currentHighlight);
+      }();
+   };
+   var gameLoop = F2(function (time,
+   gameState) {
+      return _U.replace([["sequence"
+                         ,A2($List.drop,
+                         1,
+                         gameState.sequence)]],
+      gameState);
+   });
+   var defaultState = {_: {}
+                      ,sequence: _L.fromArray([$Logo.HYellow
+                                              ,$Logo.HBlue
+                                              ,$Logo.HPurple
+                                              ,$Logo.HGreen])};
+   var gameState = A3($Signal.foldp,
+   gameLoop,
+   defaultState,
+   $Time.every($Time.second));
+   var GameState = function (a) {
+      return {_: {},sequence: a};
+   };
+   var main = A2($Signal.map,
+   renderGameState,
+   gameState);
    _elm.Main.values = {_op: _op
                       ,main: main
+                      ,GameState: GameState
+                      ,defaultState: defaultState
+                      ,gameState: gameState
+                      ,gameLoop: gameLoop
+                      ,renderGameState: renderGameState
+                      ,renderBoard: renderBoard
                       ,mainpanel: mainpanel
                       ,svgpanel: svgpanel};
    return _elm.Main.values;
@@ -9860,6 +9955,117 @@ Elm.Native.Text.make = function(localRuntime) {
 	};
 };
 
+Elm.Native.Time = {};
+Elm.Native.Time.make = function(localRuntime)
+{
+
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Time = localRuntime.Native.Time || {};
+	if (localRuntime.Native.Time.values)
+	{
+		return localRuntime.Native.Time.values;
+	}
+
+	var NS = Elm.Native.Signal.make(localRuntime);
+	var Maybe = Elm.Maybe.make(localRuntime);
+
+
+	// FRAMES PER SECOND
+
+	function fpsWhen(desiredFPS, isOn)
+	{
+		var msPerFrame = 1000 / desiredFPS;
+		var ticker = NS.input('fps-' + desiredFPS, null);
+
+		function notifyTicker()
+		{
+			localRuntime.notify(ticker.id, null);
+		}
+
+		function firstArg(x, y)
+		{
+			return x;
+		}
+
+		// input fires either when isOn changes, or when ticker fires.
+		// Its value is a tuple with the current timestamp, and the state of isOn
+		var input = NS.timestamp(A3(NS.map2, F2(firstArg), NS.dropRepeats(isOn), ticker));
+
+		var initialState = {
+			isOn: false,
+			time: localRuntime.timer.programStart,
+			delta: 0
+		};
+
+		var timeoutId;
+
+		function update(input,state)
+		{
+			var currentTime = input._0;
+			var isOn = input._1;
+			var wasOn = state.isOn;
+			var previousTime = state.time;
+
+			if (isOn)
+			{
+				timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
+			}
+			else if (wasOn)
+			{
+				clearTimeout(timeoutId);
+			}
+
+			return {
+				isOn: isOn,
+				time: currentTime,
+				delta: (isOn && !wasOn) ? 0 : currentTime - previousTime
+			};
+		}
+
+		return A2(
+			NS.map,
+			function(state) { return state.delta; },
+			A3(NS.foldp, F2(update), update(input.value,initialState), input)
+		);
+	}
+
+
+	// EVERY
+
+	function every(t)
+	{
+		var ticker = NS.input('every-' + t, null);
+		function tellTime()
+		{
+			localRuntime.notify(ticker.id, null);
+		}
+		var clock = A2( NS.map, fst, NS.timestamp(ticker) );
+		setInterval(tellTime, t);
+		return clock;
+	}
+
+
+	function fst(pair)
+	{
+		return pair._0;
+	}
+
+
+	function read(s)
+	{
+		var t = Date.parse(s);
+		return isNaN(t) ? Maybe.Nothing : Maybe.Just(t);
+	}
+
+	return localRuntime.Native.Time.values = {
+		fpsWhen: F2(fpsWhen),
+		every: every,
+		toDate: function(t) { return new window.Date(t); },
+		read: read
+	};
+
+};
+
 Elm.Native.Transform2D = {};
 Elm.Native.Transform2D.make = function(localRuntime) {
 
@@ -13457,6 +13663,85 @@ Elm.Text.make = function (_elm) {
                       ,Over: Over
                       ,Through: Through};
    return _elm.Text.values;
+};
+Elm.Time = Elm.Time || {};
+Elm.Time.make = function (_elm) {
+   "use strict";
+   _elm.Time = _elm.Time || {};
+   if (_elm.Time.values)
+   return _elm.Time.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Time",
+   $Basics = Elm.Basics.make(_elm),
+   $Native$Signal = Elm.Native.Signal.make(_elm),
+   $Native$Time = Elm.Native.Time.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var delay = $Native$Signal.delay;
+   var since = F2(function (time,
+   signal) {
+      return function () {
+         var stop = A2($Signal.map,
+         $Basics.always(-1),
+         A2(delay,time,signal));
+         var start = A2($Signal.map,
+         $Basics.always(1),
+         signal);
+         var delaydiff = A3($Signal.foldp,
+         F2(function (x,y) {
+            return x + y;
+         }),
+         0,
+         A2($Signal.merge,start,stop));
+         return A2($Signal.map,
+         F2(function (x,y) {
+            return !_U.eq(x,y);
+         })(0),
+         delaydiff);
+      }();
+   });
+   var timestamp = $Native$Signal.timestamp;
+   var every = $Native$Time.every;
+   var fpsWhen = $Native$Time.fpsWhen;
+   var fps = function (targetFrames) {
+      return A2(fpsWhen,
+      targetFrames,
+      $Signal.constant(true));
+   };
+   var inMilliseconds = function (t) {
+      return t;
+   };
+   var millisecond = 1;
+   var second = 1000 * millisecond;
+   var minute = 60 * second;
+   var hour = 60 * minute;
+   var inHours = function (t) {
+      return t / hour;
+   };
+   var inMinutes = function (t) {
+      return t / minute;
+   };
+   var inSeconds = function (t) {
+      return t / second;
+   };
+   _elm.Time.values = {_op: _op
+                      ,millisecond: millisecond
+                      ,second: second
+                      ,minute: minute
+                      ,hour: hour
+                      ,inMilliseconds: inMilliseconds
+                      ,inSeconds: inSeconds
+                      ,inMinutes: inMinutes
+                      ,inHours: inHours
+                      ,fps: fps
+                      ,fpsWhen: fpsWhen
+                      ,every: every
+                      ,timestamp: timestamp
+                      ,delay: delay
+                      ,since: since};
+   return _elm.Time.values;
 };
 Elm.Transform2D = Elm.Transform2D || {};
 Elm.Transform2D.make = function (_elm) {
