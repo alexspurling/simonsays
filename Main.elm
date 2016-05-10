@@ -1,15 +1,18 @@
-module Main where
+module Main exposing (..)
 
 import Array exposing (Array)
 import Html exposing (..)
+import Html.App as Html
 import Html.Attributes exposing (..)
 import Time exposing (..)
 import List
 import Maybe
 
-import Logo exposing (Highlight)
+import Logo exposing (Highlight, Msg)
 
-main = Signal.map renderModel model
+--main = Signal.map renderModel model
+main =
+  Html.beginnerProgram { model = defaultState, view = renderModel, update = gameLoop }
 
 type GameState
   = Start
@@ -22,27 +25,16 @@ type alias Model =
   { sequence : Array Logo.Highlight
   , highlightIndex : Int -- The index in the array of the current highlight
   , state : GameState
-  , highlightDuration : Int -- Number of game loops to do a highlight
-  , pauseDuration : Int -- Number of game loops between two highlights
-  , highlightStep : Int -- The game loop number tracking how long a highlight has been active for
-  , pauseStep : Int -- The game loop number tracking how long we have been paused for
   }
 
 defaultState = 
   { sequence = Array.fromList [Logo.HYellow, Logo.HBlue, Logo.HPurple, Logo.HGreen] 
   , highlightIndex = 0
   , state = Start
-  , highlightDuration = 100 -- 1s
-  , pauseDuration = 10 -- 0.1s
-  , highlightStep = 0
-  , pauseStep = 0
   }
 
-model : Signal Model
-model = Signal.foldp gameLoop defaultState (every second)
-
-gameLoop : Time -> Model -> Model
-gameLoop time model =
+gameLoop : Msg -> Model -> Model
+gameLoop msg model =
   case model.state of
     Start ->
       { model | state = Highlight } -- TODO start count down to first highlight
@@ -60,7 +52,7 @@ gameLoop time model =
     WaitForInput ->
       model
 
-renderModel : Model -> Html
+renderModel : Model -> Html Msg
 renderModel model =
   let
     currentHighlight =
@@ -71,7 +63,7 @@ renderModel model =
   in
     renderBoard currentHighlight
 
-renderBoard : Highlight -> Html
+renderBoard : Highlight -> Html Msg
 renderBoard highlight = 
   div [mainpanel] 
     [
@@ -79,7 +71,7 @@ renderBoard highlight =
     div [svgpanel] [Logo.logo highlight]
     ]
 
-mainpanel : Html.Attribute
+mainpanel : Html.Attribute Msg
 mainpanel = 
   style [
     ("margin-left","20%"),
@@ -87,7 +79,7 @@ mainpanel =
     ("margin-top","40px")
     ]
 
-svgpanel : Html.Attribute
+svgpanel : Html.Attribute Msg
 svgpanel = 
   style [
     ("width","500px"),

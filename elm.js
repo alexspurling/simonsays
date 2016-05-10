@@ -12299,14 +12299,8 @@ Elm.Main.make = function (_elm) {
               _U.list([svgpanel]),
               _U.list([$Logo.logo(highlight)]))]));
    };
-   var Model = F7(function (a,b,c,d,e,f,g) {
-      return {sequence: a
-             ,highlightIndex: b
-             ,state: c
-             ,highlightDuration: d
-             ,pauseDuration: e
-             ,highlightStep: f
-             ,pauseStep: g};
+   var Model = F3(function (a,b,c) {
+      return {sequence: a,highlightIndex: b,state: c};
    });
    var WaitForInput = {ctor: "WaitForInput"};
    var Pause = {ctor: "Pause"};
@@ -12338,11 +12332,7 @@ Elm.Main.make = function (_elm) {
                                                          ,$Logo.HPurple
                                                          ,$Logo.HGreen]))
                       ,highlightIndex: 0
-                      ,state: Start
-                      ,highlightDuration: 100
-                      ,pauseDuration: 10
-                      ,highlightStep: 0
-                      ,pauseStep: 0};
+                      ,state: Start};
    var model = A3($Signal.foldp,
    gameLoop,
    defaultState,

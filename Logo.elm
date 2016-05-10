@@ -1,4 +1,4 @@
-module Logo where
+module Logo exposing (..)
 
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
@@ -19,6 +19,8 @@ type Colour
 
 type alias ColourString = String
 
+type Msg = Noop
+
 colour : Colour -> Highlight -> ColourString
 colour colour highlight =
   case colour of
@@ -31,7 +33,7 @@ colour colour highlight =
     Purple ->
       if highlight == HPurple then "#3b3b97" else "#5A6378"
 
-logo : Highlight -> Html
+logo : Highlight -> Html Msg
 logo highlight =
   svg [ version "1.1", x "0", y "0", viewBox "0 0 323.141 322.95" ]
     [ polygon [ fill (colour Yellow highlight), points "161.649,152.782 231.514,82.916 91.783,82.916" ] []
