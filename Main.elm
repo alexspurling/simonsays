@@ -4,15 +4,19 @@ import Array exposing (Array)
 import Html exposing (..)
 import Html.App as Html
 import Html.Attributes exposing (..)
-import Time exposing (..)
+import Time exposing (Time, second)
 import List
 import Maybe
 
-import Logo exposing (Highlight, Msg)
+import Logo exposing (Highlight, Msg(..))
 
 --main = Signal.map renderModel model
 main =
-  Html.beginnerProgram { model = defaultState, view = renderModel, update = gameLoop }
+  Html.program { 
+    init = defaultState
+    , view = renderModel
+    , update = update 
+    , subscriptions = subscriptions }
 
 type GameState
   = Start
@@ -27,11 +31,16 @@ type alias Model =
   , state : GameState
   }
 
+defaultState : (Model, Cmd Msg)
 defaultState = 
-  { sequence = Array.fromList [Logo.HYellow, Logo.HBlue, Logo.HPurple, Logo.HGreen] 
+  ({ sequence = Array.fromList [Logo.HYellow, Logo.HBlue, Logo.HPurple, Logo.HGreen] 
   , highlightIndex = 0
   , state = Start
   }
+  , Cmd.none)
+
+update : Msg -> Model -> (Model, Cmd Msg)
+update msg model = (gameLoop msg model, Cmd.none)
 
 gameLoop : Msg -> Model -> Model
 gameLoop msg model =
@@ -85,3 +94,7 @@ svgpanel =
     ("width","500px"),
     ("height","500px")
     ]
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Time.every second Logo.Tick

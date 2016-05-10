@@ -3,6 +3,7 @@ module Logo exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Html exposing (Html)
+import Time exposing (Time)
 
 type Highlight
   = None
@@ -19,7 +20,7 @@ type Colour
 
 type alias ColourString = String
 
-type Msg = Noop
+type Msg = Tick Time
 
 colour : Colour -> Highlight -> ColourString
 colour colour highlight =
