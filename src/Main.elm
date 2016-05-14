@@ -10,7 +10,7 @@ import Time exposing (Time, second, millisecond)
 import Maybe
 import Random
 
-import Logo exposing (Highlight(..), Msg(..))
+import Logo exposing (Colour(..), Msg(..))
 import Sound exposing (Sound)
 import Util
 
@@ -24,14 +24,14 @@ main =
 
 type GameState
   = Start
-  | Highlight
+  | Colour
   | Pause
   | WaitForInput
 
 
 type alias Model =
-  { sequence : Array Logo.Highlight
-  , highlightIndex : Int -- The index in the array of the current highlight
+  { sequence : Array Logo.Colour
+  , lightIndex : Int -- The index in the array of the current light
   , state : GameState
   , sound : Sound
   }
@@ -39,7 +39,7 @@ type alias Model =
 defaultState : (Model, Cmd Msg)
 defaultState =
   ({ sequence = Array.empty
-  , highlightIndex = 0
+  , lightIndex = 0
   , state = Start
   , sound = Sound.initialSound
   }
@@ -56,62 +56,62 @@ gameLoop msg model =
        , delay (second * 1) Next)
     Next ->
       let
-        currentHightlight = Maybe.withDefault Logo.None (Array.get model.highlightIndex model.sequence)
-        _ = Sound.playNote (highlightToNote currentHightlight) model.sound
+        currentHightlight = Maybe.withDefault Logo.None (Array.get model.lightIndex model.sequence)
+        _ = Sound.playNote (lightToNote currentHightlight) model.sound
       in
-        ({ model | state = Highlight } --Highlight the current colour for 1 second
+        ({ model | state = Colour } --Colour the current colour for 1 second
         , delay (millisecond * 500) Wait)
     Wait ->
       let --Move to the next index, trigger the next colour or just wait if at the end
-        highlightIndex = model.highlightIndex + 1
-        highlightFinished = highlightIndex < (Array.length model.sequence)
-        cmd = if highlightFinished
+        lightIndex = model.lightIndex + 1
+        lightFinished = lightIndex < (Array.length model.sequence)
+        cmd = if lightFinished
           then (delay (millisecond * 100) Next)
           else Cmd.none
-        newState = if highlightFinished then WaitForInput else Pause
+        newState = if lightFinished then WaitForInput else Pause
       in
         ({ model |
-          highlightIndex = highlightIndex,
+          lightIndex = lightIndex,
           state = newState }, cmd)
-    Click highlight ->
+    Click light ->
       let
-        _ = Sound.playNote (highlightToNote highlight) model.sound
+        _ = Sound.playNote (lightToNote light) model.sound
       in
         (model, Cmd.none)
 
 delay : Time -> Msg -> Cmd Msg
 delay t msg = Task.perform (always msg) (always msg) (Process.sleep t)
 
-randomSequence : Int -> Random.Generator (Array Highlight)
+randomSequence : Int -> Random.Generator (Array Colour)
 randomSequence length =
-  Random.map Array.fromList (Random.list length (Util.oneOf [HGreen, HYellow, HPurple, HBlue]))
+  Random.map Array.fromList (Random.list length (Util.oneOf [Green, Yellow, Purple, Blue]))
 
-highlightToNote highlight =
-  case highlight of
-    HPurple -> Sound.G3
-    HGreen -> Sound.C4
-    HYellow -> Sound.E4
-    HBlue -> Sound.G4
+lightToNote light =
+  case light of
+    Purple -> Sound.G3
+    Green -> Sound.C4
+    Yellow -> Sound.E4
+    Blue -> Sound.G4
     _ -> Sound.C4
 
 renderModel : Model -> Html Msg
 renderModel model =
   let
     currentHighlight =
-      if model.state == Highlight then
-        Maybe.withDefault Logo.None (Array.get model.highlightIndex model.sequence)
+      if model.state == Colour then
+        Maybe.withDefault Logo.None (Array.get model.lightIndex model.sequence)
       else
         Logo.None
   in
     renderBoard currentHighlight
 
 
-renderBoard : Highlight -> Html Msg
-renderBoard highlight =
+renderBoard : Colour -> Html Msg
+renderBoard light =
   div [mainpanel]
     [
     h1 [] [text "Simon Says"],
-    div [svgpanel] [Logo.logo highlight]
+    div [svgpanel] [Logo.logo light]
     ]
 
 mainpanel : Html.Attribute Msg
