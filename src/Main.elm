@@ -10,7 +10,7 @@ import Time exposing (Time, second, millisecond)
 import Maybe
 import Random
 
-import Logo exposing (Highlight(..), Colour(..), Msg(..))
+import Logo exposing (Highlight(..), Msg(..))
 import Sound exposing (Sound)
 import Util
 

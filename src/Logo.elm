@@ -13,55 +13,40 @@ type Highlight
   | HPurple
   | HBlue
 
-type Colour
-  = Green
-  | Yellow
-  | Purple
-  | Blue
-
 type alias ColourString = String
 
 type Msg = Click Highlight | NewGame (Array Highlight) | Next | Wait
 
-colour : Colour -> Highlight -> ColourString
-colour colour highlight =
-  case colour of
-    Yellow ->
-      if highlight == HYellow then "#ffc229" else "#F0AD00"
-    Green ->
-      if highlight == HGreen then "#8cfe2f" else "#7FD13B"
-    Blue ->
-      if highlight == HBlue then "#38d4ff" else "#60B5CC"
-    Purple ->
-      if highlight == HPurple then "#3b3b97" else "#5A6378"
+yellow : Highlight -> ColourString
+yellow highlight = if highlight == HYellow then "#ffc229" else "#F0AD00"
+green : Highlight -> ColourString
+green highlight = if highlight == HGreen then "#8cfe2f" else "#7FD13B"
+blue : Highlight -> ColourString
+blue highlight = if highlight == HBlue then "#38d4ff" else "#60B5CC"
+purple : Highlight -> ColourString
+purple highlight = if highlight == HPurple then "#3b3b97" else "#5A6378"
 
-edge : Colour -> Highlight -> Attribute Msg
-edge colour highlight =
-  let
-    edgeStyle =
-      case colour of
-        Yellow ->
-          if highlight == HYellow then "stroke:#ffc229;stroke-width:2" else ""
-        Green ->
-          if highlight == HGreen then "stroke:#8cfe2f;stroke-width:2" else ""
-        Blue ->
-          if highlight == HBlue then "stroke:#38d4ff;stroke-width:2" else ""
-        Purple ->
-          if highlight == HPurple then "stroke:#3b3b97;stroke-width:2" else ""
-  in
-    Svg.Attributes.style edgeStyle
+
+yellowEdge : Highlight -> Svg.Attribute Msg
+yellowEdge highlight = (if highlight == HYellow then "stroke:#ffc229;stroke-width:2" else "") |> Svg.Attributes.style
+greenEdge : Highlight -> Svg.Attribute Msg
+greenEdge highlight = (if highlight == HGreen then "stroke:#8cfe2f;stroke-width:2" else "") |> Svg.Attributes.style
+blueEdge : Highlight -> Svg.Attribute Msg
+blueEdge highlight = (if highlight == HBlue then "stroke:#38d4ff;stroke-width:2" else "") |> Svg.Attributes.style
+purpleEdge : Highlight -> Svg.Attribute Msg
+purpleEdge highlight = (if highlight == HPurple then "stroke:#3b3b97;stroke-width:2" else "") |> Svg.Attributes.style
 
 logo : Highlight -> Html Msg
 logo highlight =
   let
-    colourYellow = colour Yellow highlight
-    colourGreen = colour Green highlight
-    colourBlue = colour Blue highlight
-    colourPurple = colour Purple highlight
-    edgeYellow = edge Yellow highlight
-    edgeGreen = edge Green highlight
-    edgeBlue = edge Blue highlight
-    edgePurple = edge Purple highlight
+    colourYellow = yellow highlight
+    colourGreen = green highlight
+    colourBlue = blue highlight
+    colourPurple = purple highlight
+    edgeYellow = yellowEdge highlight
+    edgeGreen = greenEdge highlight
+    edgeBlue = blueEdge highlight
+    edgePurple = purpleEdge highlight
   in
     svg [ version "1.1", x "0", y "0", viewBox "0 0 323.141 322.95" ]
       [ polygon [ edgeYellow, fill colourYellow, onClick (Click HYellow), points "161.649,152.782 231.514,82.916 91.783,82.916" ] []
