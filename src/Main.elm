@@ -9,9 +9,9 @@ import Process
 import Time exposing (Time, second, millisecond)
 import Maybe
 import Random
-import WebAudio exposing (OscillatorNode, AudioContext(DefaultContext), setValue, stopOscillator, startOscillator, getDestinationNode, connectNodes, OscillatorWaveType(..), createOscillatorNode, getCurrentTime)
 
 import Logo exposing (Highlight(..), Colour(..), Msg(..))
+import Sound exposing (Sound)
 import Util
 
 main : Program Never
@@ -33,6 +33,7 @@ type alias Model =
   { sequence : Array Logo.Highlight
   , highlightIndex : Int -- The index in the array of the current highlight
   , state : GameState
+  , sound : Sound
   }
 
 defaultState : (Model, Cmd Msg)
@@ -40,6 +41,7 @@ defaultState =
   ({ sequence = Array.empty
   , highlightIndex = 0
   , state = Start
+  , sound = Sound.initialSound
   }
   , Random.generate NewGame (randomSequence 5))
 
@@ -50,21 +52,21 @@ gameLoop : Msg -> Model -> (Model, Cmd Msg)
 gameLoop msg model =
   case msg of
     NewGame newSequence ->
-      (Debug.log "new game model" ({ model | sequence = newSequence })
-      , delay (second * 1) Next)
+      ({ model | sequence = newSequence }
+       , delay (second * 1) Next)
     Next ->
       let
         currentHightlight = Maybe.withDefault Logo.None (Array.get model.highlightIndex model.sequence)
-        _ = playNote (highlightToFreq currentHightlight)
+        _ = Sound.playNote (highlightToFreq currentHightlight) model.sound
       in
         ({ model | state = Highlight } --Highlight the current colour for 1 second
-        , delay (millisecond * 1000) Wait)
+        , delay (millisecond * 500) Wait)
     Wait ->
       let --Move to the next index, trigger the next colour or just wait if at the end
         highlightIndex = model.highlightIndex + 1
         highlightFinished = highlightIndex < (Array.length model.sequence)
         cmd = if highlightFinished
-          then (delay (millisecond * 300) Next)
+          then (delay (millisecond * 100) Next)
           else Cmd.none
         newState = if highlightFinished then WaitForInput else Pause
       in
@@ -73,8 +75,7 @@ gameLoop msg model =
           state = newState }, cmd)
     Click colour ->
       let
-        _ = Debug.log "click" colour
-        _ = playNote (colourToFreq colour)
+        _ = Sound.playNote (colourToFreq colour) model.sound
       in
         (model, Cmd.none)
 
@@ -85,18 +86,6 @@ randomSequence : Int -> Random.Generator (Array Highlight)
 randomSequence length =
   Random.map Array.fromList (Random.list length (Util.oneOf [HGreen, HYellow, HPurple, HBlue]))
 
-playNote : Float -> ()
-playNote freq =
-  let
-    currentTime = getCurrentTime DefaultContext
-    oscillator = createOscillatorNode DefaultContext Sine
-                   |> connectNodes (getDestinationNode DefaultContext) 0 0
-                   |> startOscillator currentTime
-    _ = setValue freq oscillator.frequency
-    _ = Debug.log "freq" freq
-    _ = stopOscillator (currentTime + 1) oscillator
-  in
-    ()
 
 highlightToFreq highlight =
   case highlight of
