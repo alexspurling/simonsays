@@ -9,8 +9,9 @@ import Process
 import Time exposing (Time, second, millisecond)
 import Maybe
 import Random
+import WebAudio exposing (OscillatorNode, AudioContext(DefaultContext), setValue, stopOscillator, startOscillator, getDestinationNode, connectNodes, OscillatorWaveType(..), createOscillatorNode, getCurrentTime)
 
-import Logo exposing (Highlight(..), Colour, Msg(..))
+import Logo exposing (Highlight(..), Colour(..), Msg(..))
 import Util
 
 main : Program Never
@@ -52,20 +53,30 @@ gameLoop msg model =
       (Debug.log "new game model" ({ model | sequence = newSequence })
       , delay (second * 1) Next)
     Next ->
-      ({ model | state = Highlight } --Highlight the current colour for 1 second
-      , delay (millisecond * 1000) Wait)
+      let
+        currentHightlight = Maybe.withDefault Logo.None (Array.get model.highlightIndex model.sequence)
+        _ = playNote (highlightToFreq currentHightlight)
+      in
+        ({ model | state = Highlight } --Highlight the current colour for 1 second
+        , delay (millisecond * 1000) Wait)
     Wait ->
       let --Move to the next index, trigger the next colour or just wait if at the end
         highlightIndex = model.highlightIndex + 1
-        cmd = if highlightIndex < (Array.length model.sequence)
+        highlightFinished = highlightIndex < (Array.length model.sequence)
+        cmd = if highlightFinished
           then (delay (millisecond * 300) Next)
           else Cmd.none
+        newState = if highlightFinished then WaitForInput else Pause
       in
         ({ model |
           highlightIndex = highlightIndex,
-          state = Pause }, cmd)
+          state = newState }, cmd)
     Click colour ->
-      (model, Cmd.none)
+      let
+        _ = Debug.log "click" colour
+        _ = playNote (colourToFreq colour)
+      in
+        (model, Cmd.none)
 
 delay : Time -> Msg -> Cmd Msg
 delay t msg = Task.perform (always msg) (always msg) (Process.sleep t)
@@ -74,16 +85,33 @@ randomSequence : Int -> Random.Generator (Array Highlight)
 randomSequence length =
   Random.map Array.fromList (Random.list length (Util.oneOf [HGreen, HYellow, HPurple, HBlue]))
 
-highlight : Model -> (Model, Cmd Msg)
-highlight model =
+playNote : Float -> ()
+playNote freq =
   let
-    highlightIndex = model.highlightIndex + 1
-    newState =
-      if highlightIndex < (Array.length model.sequence) then Pause else WaitForInput
+    currentTime = getCurrentTime DefaultContext
+    oscillator = createOscillatorNode DefaultContext Sine
+                   |> connectNodes (getDestinationNode DefaultContext) 0 0
+                   |> startOscillator currentTime
+    _ = setValue freq oscillator.frequency
+    _ = Debug.log "freq" freq
+    _ = stopOscillator (currentTime + 1) oscillator
   in
-    ({ model |
-      highlightIndex = highlightIndex,
-      state = newState }, Cmd.none)
+    ()
+
+highlightToFreq highlight =
+  case highlight of
+    HPurple -> 196.00 --G3
+    HGreen -> 261.63  --C4
+    HBlue -> 392.00   --G4
+    HYellow -> 329.63 --E4
+    _ -> 220
+
+colourToFreq colour =
+  case colour of
+    Purple -> 196.00 --G3
+    Green -> 261.63  --C4
+    Blue -> 392.00   --G4
+    Yellow -> 329.63 --E4
 
 renderModel : Model -> Html Msg
 renderModel model =
