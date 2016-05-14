@@ -57,7 +57,7 @@ gameLoop msg model =
     Next ->
       let
         currentHightlight = Maybe.withDefault Logo.None (Array.get model.highlightIndex model.sequence)
-        _ = Sound.playNote (highlightToFreq currentHightlight) model.sound
+        _ = Sound.playNote (highlightToNote currentHightlight) model.sound
       in
         ({ model | state = Highlight } --Highlight the current colour for 1 second
         , delay (millisecond * 500) Wait)
@@ -73,9 +73,9 @@ gameLoop msg model =
         ({ model |
           highlightIndex = highlightIndex,
           state = newState }, cmd)
-    Click colour ->
+    Click highlight ->
       let
-        _ = Sound.playNote (colourToFreq colour) model.sound
+        _ = Sound.playNote (highlightToNote highlight) model.sound
       in
         (model, Cmd.none)
 
@@ -86,21 +86,13 @@ randomSequence : Int -> Random.Generator (Array Highlight)
 randomSequence length =
   Random.map Array.fromList (Random.list length (Util.oneOf [HGreen, HYellow, HPurple, HBlue]))
 
-
-highlightToFreq highlight =
+highlightToNote highlight =
   case highlight of
-    HPurple -> 196.00 --G3
-    HGreen -> 261.63  --C4
-    HBlue -> 392.00   --G4
-    HYellow -> 329.63 --E4
-    _ -> 220
-
-colourToFreq colour =
-  case colour of
-    Purple -> 196.00 --G3
-    Green -> 261.63  --C4
-    Blue -> 392.00   --G4
-    Yellow -> 329.63 --E4
+    HPurple -> Sound.G3
+    HGreen -> Sound.C4
+    HYellow -> Sound.E4
+    HBlue -> Sound.G4
+    _ -> Sound.C4
 
 renderModel : Model -> Html Msg
 renderModel model =

@@ -21,7 +21,7 @@ type Colour
 
 type alias ColourString = String
 
-type Msg = Click Colour | NewGame (Array Highlight) | Next | Wait
+type Msg = Click Highlight | NewGame (Array Highlight) | Next | Wait
 
 colour : Colour -> Highlight -> ColourString
 colour colour highlight =
@@ -64,16 +64,16 @@ logo highlight =
     edgePurple = edge Purple highlight
   in
     svg [ version "1.1", x "0", y "0", viewBox "0 0 323.141 322.95" ]
-      [ polygon [ edgeYellow, fill colourYellow, onClick (Click Yellow), points "161.649,152.782 231.514,82.916 91.783,82.916" ] []
-      , polygon [ edgeGreen, fill colourGreen, onClick (Click Green), points "8.867,0 79.241,70.375 232.213,70.375 161.838,0" ] []
+      [ polygon [ edgeYellow, fill colourYellow, onClick (Click HYellow), points "161.649,152.782 231.514,82.916 91.783,82.916" ] []
+      , polygon [ edgeGreen, fill colourGreen, onClick (Click HGreen), points "8.867,0 79.241,70.375 232.213,70.375 161.838,0" ] []
       , rect
-          [ edgeGreen, fill colourGreen, onClick (Click Green)
+          [ edgeGreen, fill colourGreen, onClick (Click HGreen)
           , x "192.99", y "107.392", width "107.676", height "108.167"
           , transform "matrix(0.7071 0.7071 -0.7071 0.7071 186.4727 -127.2386)"
           ]
           []
-      , polygon [ edgeBlue, fill colourBlue, onClick (Click Blue), points "323.298,143.724 323.298,0 179.573,0" ] []
-      , polygon [ edgePurple, fill colourPurple, onClick (Click Purple), points "152.781,161.649 0,8.868 0,314.432" ] []
-      , polygon [ edgeYellow, fill colourYellow, onClick (Click Yellow), points "255.522,246.655 323.298,314.432 323.298,178.879" ] []
-      , polygon [ edgeBlue, fill colourBlue, onClick (Click Blue), points "161.649,170.517 8.869,323.298 314.43,323.298" ] []
+      , polygon [ edgeBlue, fill colourBlue, onClick (Click HBlue), points "323.298,143.724 323.298,0 179.573,0" ] []
+      , polygon [ edgePurple, fill colourPurple, onClick (Click HPurple), points "152.781,161.649 0,8.868 0,314.432" ] []
+      , polygon [ edgeYellow, fill colourYellow, onClick (Click HYellow), points "255.522,246.655 323.298,314.432 323.298,178.879" ] []
+      , polygon [ edgeBlue, fill colourBlue, onClick (Click HBlue), points "161.649,170.517 8.869,323.298 314.43,323.298" ] []
       ]
