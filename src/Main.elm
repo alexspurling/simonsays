@@ -66,13 +66,18 @@ gameLoop msg model =
         ({ model | light = Logo.None }, (delay (millisecond * 100) Next))
       else
         --Sequence has finished
-        ({ model | light = Logo.None, state = WaitForInput }, Cmd.none)
+        ({ model | light = Logo.None
+         , state = WaitForInput
+         , lightIndex = 0 }, Cmd.none)
     Click light ->
       if model.state == WaitForInput then
         let
-          _ = Sound.playNote (lightToNote light) model.sound
+          expectedColour = Maybe.withDefault Logo.None (Array.get model.lightIndex model.sequence)
+          sound = if light == expectedColour then (lightToNote light) else Sound.Nope
+          newIndex = if light == expectedColour then model.lightIndex + 1 else 0
+          _ = Sound.playNote sound model.sound
         in
-          ({ model | light = light }, delay (millisecond * 500) Done)
+          ({ model | light = light, lightIndex = newIndex }, delay (millisecond * 500) Done)
       else
         (model, Cmd.none)
     Done ->
