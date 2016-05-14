@@ -4,14 +4,15 @@ import Array exposing (Array)
 import Html exposing (..)
 import Html.App as Html
 import Html.Attributes exposing (..)
-import Time exposing (Time, second)
+import Task
+import Process
+import Time exposing (Time, second, millisecond)
 import Maybe
 import Random
 
 import Logo exposing (Highlight(..), Colour, Msg(..))
 import Util
 
---main = Signal.map renderModel model
 main : Program Never
 main =
   Html.program {
@@ -42,40 +43,47 @@ defaultState =
   , Random.generate NewGame (randomSequence 5))
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update msg model = (gameLoop msg model, Cmd.none)
+update msg model = gameLoop msg model
 
-gameLoop : Msg -> Model -> Model
+gameLoop : Msg -> Model -> (Model, Cmd Msg)
 gameLoop msg model =
   case msg of
     NewGame newSequence ->
-      Debug.log "new game model" ({ model | sequence = newSequence })
-    Tick time ->
-      case model.state of
-        Start ->
-          { model | state = Highlight }
-        Highlight ->
-          let
-            highlightIndex = model.highlightIndex + 1
-            newState =
-              if highlightIndex < Array.length model.sequence then Pause else WaitForInput
-          in
-            { model |
-              highlightIndex = highlightIndex,
-              state = newState }
-        Pause ->
-          { model | state = Highlight }
-        WaitForInput ->
-          model
+      (Debug.log "new game model" ({ model | sequence = newSequence })
+      , delay (second * 1) Next)
+    Next ->
+      ({ model | state = Highlight } --Highlight the current colour for 1 second
+      , delay (millisecond * 1000) Wait)
+    Wait ->
+      let --Move to the next index, trigger the next colour or just wait if at the end
+        highlightIndex = model.highlightIndex + 1
+        cmd = if highlightIndex < (Array.length model.sequence)
+          then (delay (millisecond * 300) Next)
+          else Cmd.none
+      in
+        ({ model |
+          highlightIndex = highlightIndex,
+          state = Pause }, cmd)
     Click colour ->
-      case model.state of
-        WaitForInput ->
-          model
-        _ ->
-          model
+      (model, Cmd.none)
+
+delay : Time -> Msg -> Cmd Msg
+delay t msg = Task.perform (always msg) (always msg) (Process.sleep t)
 
 randomSequence : Int -> Random.Generator (Array Highlight)
 randomSequence length =
   Random.map Array.fromList (Random.list length (Util.oneOf [HGreen, HYellow, HPurple, HBlue]))
+
+highlight : Model -> (Model, Cmd Msg)
+highlight model =
+  let
+    highlightIndex = model.highlightIndex + 1
+    newState =
+      if highlightIndex < (Array.length model.sequence) then Pause else WaitForInput
+  in
+    ({ model |
+      highlightIndex = highlightIndex,
+      state = newState }, Cmd.none)
 
 renderModel : Model -> Html Msg
 renderModel model =
@@ -114,4 +122,4 @@ svgpanel =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every second Logo.Tick
+  Sub.none

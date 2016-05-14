@@ -1,8 +1,9 @@
 Todo
 
 + Add click handlers to each element of the SVG (no idea how?)
++ Generate a random sequence of colours for the initial sequence
++ Use random sequence to display highlights
++ Shorten the delay between highlights
 
-- Generate a random sequence of colours for the initial sequence
-- Use random sequence to display highlights
 - Use an index to track which is the expected colour to wait for
 - Verify the correct colour was chosen
