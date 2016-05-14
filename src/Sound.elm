@@ -6,19 +6,21 @@ type alias Sound =
   { g3 : MediaElementAudioSourceNode
   , c4 : MediaElementAudioSourceNode
   , e4 : MediaElementAudioSourceNode
-  , g4 : MediaElementAudioSourceNode }
+  , g4 : MediaElementAudioSourceNode
+  , nope : MediaElementAudioSourceNode }
 
-type Note = G3 | C4 | E4 | G4
+type Note = G3 | C4 | E4 | G4 | Nope
 
 initialSound : Sound
 initialSound =
   let
-    g3 = getMediaElement "/assets/g3.wav"
-    c4 = getMediaElement "/assets/c4.wav"
-    e4 = getMediaElement "/assets/e4.wav"
-    g4 = getMediaElement "/assets/g4.wav"
+    g3 = getMediaElement "/assets/g32.wav"
+    c4 = getMediaElement "/assets/c42.wav"
+    e4 = getMediaElement "/assets/e42.wav"
+    g4 = getMediaElement "/assets/g42.wav"
+    nope = getMediaElement "/assets/nope.wav"
   in
-    { g3 = g3, c4 = c4, e4 = e4, g4 = g4 }
+    { g3 = g3, c4 = c4, e4 = e4, g4 = g4, nope = nope }
 
 playNote : Note -> Sound -> ()
 playNote note sound =
@@ -28,6 +30,7 @@ playNote note sound =
           C4 -> playMediaElement sound.c4
           E4 -> playMediaElement sound.e4
           G4 -> playMediaElement sound.g4
+          Nope -> playMediaElement sound.nope
   in
     ()
 
