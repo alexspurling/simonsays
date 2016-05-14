@@ -23,15 +23,14 @@ main =
     , subscriptions = subscriptions }
 
 type GameState
-  = Start
-  | Colour
-  | Pause
+  = Play
   | WaitForInput
 
 
 type alias Model =
   { sequence : Array Logo.Colour
   , lightIndex : Int -- The index in the array of the current light
+  , light : Colour --The colour to highlight
   , state : GameState
   , sound : Sound
   }
@@ -40,7 +39,8 @@ defaultState : (Model, Cmd Msg)
 defaultState =
   ({ sequence = Array.empty
   , lightIndex = 0
-  , state = Start
+  , light = Logo.None
+  , state = Play
   , sound = Sound.initialSound
   }
   , Random.generate NewGame (randomSequence 5))
@@ -56,28 +56,27 @@ gameLoop msg model =
        , delay (second * 1) Next)
     Next ->
       let
-        currentHightlight = Maybe.withDefault Logo.None (Array.get model.lightIndex model.sequence)
-        _ = Sound.playNote (lightToNote currentHightlight) model.sound
+        curLight = Maybe.withDefault Logo.None (Array.get model.lightIndex model.sequence)
+        _ = Sound.playNote (lightToNote curLight) model.sound
       in
-        ({ model | state = Colour } --Colour the current colour for 1 second
+        ({ model | light = curLight, lightIndex = model.lightIndex + 1 }
         , delay (millisecond * 500) Wait)
     Wait ->
-      let --Move to the next index, trigger the next colour or just wait if at the end
-        lightIndex = model.lightIndex + 1
-        lightFinished = lightIndex < (Array.length model.sequence)
-        cmd = if lightFinished
-          then (delay (millisecond * 100) Next)
-          else Cmd.none
-        newState = if lightFinished then WaitForInput else Pause
-      in
-        ({ model |
-          lightIndex = lightIndex,
-          state = newState }, cmd)
+      if model.lightIndex < (Array.length model.sequence) then
+        ({ model | light = Logo.None }, (delay (millisecond * 100) Next))
+      else
+        --Sequence has finished
+        ({ model | light = Logo.None, state = WaitForInput }, Cmd.none)
     Click light ->
-      let
-        _ = Sound.playNote (lightToNote light) model.sound
-      in
+      if model.state == WaitForInput then
+        let
+          _ = Sound.playNote (lightToNote light) model.sound
+        in
+          ({ model | light = light }, delay (millisecond * 500) Done)
+      else
         (model, Cmd.none)
+    Done ->
+      ({ model | light = Logo.None }, Cmd.none)
 
 delay : Time -> Msg -> Cmd Msg
 delay t msg = Task.perform (always msg) (always msg) (Process.sleep t)
@@ -86,32 +85,21 @@ randomSequence : Int -> Random.Generator (Array Colour)
 randomSequence length =
   Random.map Array.fromList (Random.list length (Util.oneOf [Green, Yellow, Purple, Blue]))
 
+lightToNote : Colour -> Sound.Note
 lightToNote light =
   case light of
     Purple -> Sound.G3
     Green -> Sound.C4
     Yellow -> Sound.E4
     Blue -> Sound.G4
-    _ -> Sound.C4
+    None -> Sound.C4
 
 renderModel : Model -> Html Msg
 renderModel model =
-  let
-    currentHighlight =
-      if model.state == Colour then
-        Maybe.withDefault Logo.None (Array.get model.lightIndex model.sequence)
-      else
-        Logo.None
-  in
-    renderBoard currentHighlight
-
-
-renderBoard : Colour -> Html Msg
-renderBoard light =
   div [mainpanel]
     [
     h1 [] [text "Simon Says"],
-    div [svgpanel] [Logo.logo light]
+    div [svgpanel] [Logo.logo model.light]
     ]
 
 mainpanel : Html.Attribute Msg

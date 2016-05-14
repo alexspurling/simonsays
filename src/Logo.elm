@@ -15,7 +15,7 @@ type Colour
 
 type alias ColourString = String
 
-type Msg = Click Colour | NewGame (Array Colour) | Next | Wait
+type Msg = Click Colour | NewGame (Array Colour) | Next | Wait | Done
 
 yellow : Colour -> ColourString
 yellow light = if light == Yellow then "#ffc229" else "#F0AD00"
