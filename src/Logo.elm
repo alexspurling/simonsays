@@ -1,6 +1,5 @@
 module Logo exposing (..)
 
-import Array exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)

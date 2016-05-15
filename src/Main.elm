@@ -22,7 +22,7 @@ main =
     , update = update
     , subscriptions = subscriptions }
 
-type Msg = NewGame (Array Colour) | Next | Wait | Done | Click Colour
+type Msg = NewGame (Array Colour) | Next | Wait | Done | Click Colour | NextColour Colour
 
 type GameState
   = Play
@@ -45,7 +45,7 @@ defaultState =
   , state = Play
   , sound = Sound.initialSound
   }
-  , Random.generate NewGame (randomSequence 5))
+  , Random.generate NewGame (randomSequence 1))
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model = gameLoop msg model
@@ -81,8 +81,21 @@ gameLoop msg model =
           ({ model | light = light, lightIndex = newIndex }, cmd)
       else
         (model, Cmd.none)
+    NextColour colour ->
+      --Add the new colour onto the sequence and start again from the beginning
+      ({ model | sequence = Array.push colour model.sequence
+      , lightIndex = 0 }
+      , delay (second * 1) Next)
     Done ->
-      ({ model | light = Logo.None }, Cmd.none)
+      --If the entire sequence was guessed correctly, then add another random
+      --colour to the end and restart
+      let
+        cmd = if model.lightIndex == Array.length model.sequence then
+          Random.generate NextColour (Util.oneOf [Green, Yellow, Purple, Blue])
+        else
+          Cmd.none
+      in
+        ({ model | light = Logo.None }, cmd)
 
 guessedRight : Model -> Colour -> (Int, Sound.Note, Cmd Msg)
 guessedRight model light =
@@ -90,7 +103,7 @@ guessedRight model light =
 
 guessedWrong : (Int, Sound.Note, Cmd Msg)
 guessedWrong =
-  (0, Sound.Nope, Random.generate NewGame (randomSequence 5))
+  (0, Sound.Nope, Random.generate NewGame (randomSequence 1))
 
 delay : Time -> Msg -> Cmd Msg
 delay t msg = Task.perform (always msg) (always msg) (Process.sleep t)
