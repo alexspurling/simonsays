@@ -75,15 +75,22 @@ gameLoop msg model =
       if model.state == WaitForInput then
         let
           expectedColour = Maybe.withDefault Logo.None (Array.get model.lightIndex model.sequence)
-          sound = if light == expectedColour then (lightToNote light) else Sound.Nope
-          newIndex = if light == expectedColour then model.lightIndex + 1 else 0
+          (newIndex, sound, cmd) = if expectedColour == light then guessedRight model light else guessedWrong
           _ = Sound.playNote sound model.sound
         in
-          ({ model | light = light, lightIndex = newIndex }, delay (millisecond * 500) Done)
+          ({ model | light = light, lightIndex = newIndex }, cmd)
       else
         (model, Cmd.none)
     Done ->
       ({ model | light = Logo.None }, Cmd.none)
+
+guessedRight : Model -> Colour -> (Int, Sound.Note, Cmd Msg)
+guessedRight model light =
+  (model.lightIndex + 1, lightToNote light, delay (millisecond * 500) Done)
+
+guessedWrong : (Int, Sound.Note, Cmd Msg)
+guessedWrong =
+  (0, Sound.Nope, Random.generate NewGame (randomSequence 5))
 
 delay : Time -> Msg -> Cmd Msg
 delay t msg = Task.perform (always msg) (always msg) (Process.sleep t)
