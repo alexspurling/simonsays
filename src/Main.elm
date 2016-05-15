@@ -42,6 +42,7 @@ type alias Model =
   , light : Colour --The colour to highlight
   , state : GameState
   , sound : Sound
+  , highscore : Int
   }
 
 defaultState : (Model, Cmd Msg)
@@ -51,6 +52,7 @@ defaultState =
   , light = Logo.None
   , state = Play
   , sound = Sound.initialSound
+  , highscore = 0
   }
   , Random.generate NewGame (randomSequence 1))
 
@@ -101,12 +103,17 @@ gameLoop msg model =
       --If the entire sequence was guessed correctly, then add another random
       --colour to the end and restart
       let
-        cmd = if model.lightIndex == Array.length model.sequence then
+        sequenceComplete = model.lightIndex == Array.length model.sequence
+        cmd = if sequenceComplete then
           Random.generate NextColour (Util.oneOf [Green, Yellow, Purple, Blue])
         else
           Cmd.none
+        highscore = if sequenceComplete then
+          Basics.max model.highscore (Array.length model.sequence)
+        else
+          model.highscore
       in
-        ({ model | light = Logo.None }, cmd)
+        ({ model | light = Logo.None, highscore = highscore }, cmd)
     GameOver ->
       ({ model | light = Logo.None }, Random.generate NewGame (randomSequence 1))
 
@@ -139,6 +146,7 @@ renderModel model =
   div [mainpanel]
     [
     h1 [] [text "Simon Says"],
+    p [] [text ("Highscore: " ++ (toString model.highscore))],
     div [svgpanel] [Html.map logoMsgToMainMsg (Logo.logo model.light)]
     ]
 
@@ -152,7 +160,7 @@ mainpanel =
   style [
     ("margin-left","20%"),
     ("margin-right","20%"),
-    ("margin-top","40px")
+    ("margin-top","20px")
     ]
 
 svgpanel : Html.Attribute Msg
