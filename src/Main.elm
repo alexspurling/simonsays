@@ -22,7 +22,14 @@ main =
     , update = update
     , subscriptions = subscriptions }
 
-type Msg = NewGame (Array Colour) | Next | Wait | Done | Click Colour | NextColour Colour
+type Msg
+  = NewGame (Array Colour)
+  | Next
+  | Wait
+  | Done
+  | Click Colour
+  | NextColour Colour
+  | GameOver
 
 type GameState
   = Play
@@ -54,7 +61,7 @@ gameLoop : Msg -> Model -> (Model, Cmd Msg)
 gameLoop msg model =
   case msg of
     NewGame newSequence ->
-      ({ model | sequence = newSequence }
+      ({ model | sequence = newSequence, state = Play }
        , delay (second * 1) Next)
     Next ->
       let
@@ -75,16 +82,20 @@ gameLoop msg model =
       if model.state == WaitForInput then
         let
           expectedColour = Maybe.withDefault Logo.None (Array.get model.lightIndex model.sequence)
-          (newIndex, sound, cmd) = if expectedColour == light then guessedRight model light else guessedWrong
+          (newIndex, sound, cmd) = if expectedColour == light then
+            guessedRight model light
+          else
+            guessedWrong
           _ = Sound.playNote sound model.sound
         in
-          ({ model | light = light, lightIndex = newIndex }, cmd)
+          ({ model | light = light, lightIndex = newIndex }, delay (millisecond * 500) cmd)
       else
         (model, Cmd.none)
     NextColour colour ->
       --Add the new colour onto the sequence and start again from the beginning
       ({ model | sequence = Array.push colour model.sequence
-      , lightIndex = 0 }
+      , lightIndex = 0
+      , state = Play }
       , delay (second * 1) Next)
     Done ->
       --If the entire sequence was guessed correctly, then add another random
@@ -96,14 +107,16 @@ gameLoop msg model =
           Cmd.none
       in
         ({ model | light = Logo.None }, cmd)
+    GameOver ->
+      ({ model | light = Logo.None }, Random.generate NewGame (randomSequence 1))
 
-guessedRight : Model -> Colour -> (Int, Sound.Note, Cmd Msg)
+guessedRight : Model -> Colour -> (Int, Sound.Note, Msg)
 guessedRight model light =
-  (model.lightIndex + 1, lightToNote light, delay (millisecond * 500) Done)
+  (model.lightIndex + 1, lightToNote light, Done)
 
-guessedWrong : (Int, Sound.Note, Cmd Msg)
+guessedWrong : (Int, Sound.Note, Msg)
 guessedWrong =
-  (0, Sound.Nope, Random.generate NewGame (randomSequence 1))
+  (0, Sound.Nope, GameOver)
 
 delay : Time -> Msg -> Cmd Msg
 delay t msg = Task.perform (always msg) (always msg) (Process.sleep t)
