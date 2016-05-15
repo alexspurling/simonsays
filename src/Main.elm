@@ -10,7 +10,7 @@ import Time exposing (Time, second, millisecond)
 import Maybe
 import Random
 
-import Logo exposing (Colour(..), Msg(..))
+import Logo exposing (Colour(..))
 import Sound exposing (Sound)
 import Util
 
@@ -21,6 +21,8 @@ main =
     , view = renderModel
     , update = update
     , subscriptions = subscriptions }
+
+type Msg = NewGame (Array Colour) | Next | Wait | Done | Click Colour
 
 type GameState
   = Play
@@ -104,8 +106,13 @@ renderModel model =
   div [mainpanel]
     [
     h1 [] [text "Simon Says"],
-    div [svgpanel] [Logo.logo model.light]
+    div [svgpanel] [Html.map logoMsgToMainMsg (Logo.logo model.light)]
     ]
+
+logoMsgToMainMsg : Logo.Msg -> Msg
+logoMsgToMainMsg logoMsg =
+  case logoMsg of
+    Logo.Click colour -> Click colour
 
 mainpanel : Html.Attribute Msg
 mainpanel =

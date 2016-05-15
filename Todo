@@ -4,6 +4,10 @@ Todo
 + Generate a random sequence of colours for the initial sequence
 + Use random sequence to display highlights
 + Shorten the delay between highlights
++ Use an index to track which is the expected colour to wait for
++ Verify the correct colour was chosen
++ Create two Msg types for Logo and Main and use Html.App.map to map one to the other
 
-- Use an index to track which is the expected colour to wait for
-- Verify the correct colour was chosen
+- start with a short sequence
+- if player guesses correctly, add to sequence
+- if player guesses incorrctly, start new game
