@@ -26,7 +26,7 @@ type Msg
   = NewGame (Array Colour)
   | Next
   | Wait
-  | Done
+  | Done Int
   | Click Colour
   | NextColour Colour
   | GameOver
@@ -84,6 +84,13 @@ gameLoop msg model =
       if model.state == WaitForInput then
         let
           expectedColour = Maybe.withDefault Logo.None (Array.get model.lightIndex model.sequence)
+
+          guessedRight model light =
+            (model.lightIndex + 1, lightToNote light, Done (model.lightIndex + 1))
+
+          guessedWrong =
+            (0, Sound.Nope, GameOver)
+
           (newIndex, sound, cmd) = if expectedColour == light then
             guessedRight model light
           else
@@ -99,7 +106,7 @@ gameLoop msg model =
       , lightIndex = 0
       , state = Play }
       , delay (second * 1) Next)
-    Done ->
+    Done prevLightIndex ->
       --If the entire sequence was guessed correctly, then add another random
       --colour to the end and restart
       let
@@ -108,22 +115,23 @@ gameLoop msg model =
           Random.generate NextColour (Util.oneOf [Green, Yellow, Purple, Blue])
         else
           Cmd.none
+
         highscore = if sequenceComplete then
           Basics.max model.highscore (Array.length model.sequence)
         else
           model.highscore
+
+        --Only update the light colour if the model hasn't moved on
+        --to the next index already
+        light = if prevLightIndex >= model.lightIndex then
+          Logo.None
+        else
+          model.light
       in
-        ({ model | light = Logo.None, highscore = highscore }, cmd)
+        ({ model | light = light, highscore = highscore }, cmd)
     GameOver ->
       ({ model | light = Logo.None }, Random.generate NewGame (randomSequence 1))
 
-guessedRight : Model -> Colour -> (Int, Sound.Note, Msg)
-guessedRight model light =
-  (model.lightIndex + 1, lightToNote light, Done)
-
-guessedWrong : (Int, Sound.Note, Msg)
-guessedWrong =
-  (0, Sound.Nope, GameOver)
 
 delay : Time -> Msg -> Cmd Msg
 delay t msg = Task.perform (always msg) (always msg) (Process.sleep t)
