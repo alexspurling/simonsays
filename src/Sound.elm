@@ -1,41 +1,30 @@
 module Sound exposing (..)
 
+import List
+import Platform.Cmd exposing (batch)
+
 import WebAudio exposing (..)
 
-type alias Sound =
-  { g3 : MediaElementAudioSourceNode
-  , c4 : MediaElementAudioSourceNode
-  , e4 : MediaElementAudioSourceNode
-  , g4 : MediaElementAudioSourceNode
-  , nope : MediaElementAudioSourceNode }
 
 type Note = G3 | C4 | E4 | G4 | Nope
 
-initialSound : Sound
-initialSound =
-  let
-    g3 = getMediaElement "/assets/g3.wav"
-    c4 = getMediaElement "/assets/c4.wav"
-    e4 = getMediaElement "/assets/e4.wav"
-    g4 = getMediaElement "/assets/g4.wav"
-    nope = getMediaElement "/assets/nope.wav"
-  in
-    { g3 = g3, c4 = c4, e4 = e4, g4 = g4, nope = nope }
+soundUrl : Note -> String
+soundUrl note =
+  case note of
+    G3 -> "/assets/g3.wav"
+    C4 -> "/assets/c4.wav"
+    E4 -> "/assets/e4.wav"
+    G4 -> "/assets/g4.wav"
+    Nope -> "/assets/nope.wav"
 
-playNote : Note -> Sound -> ()
-playNote note sound =
-  let
-    _ = case note of
-          G3 -> playMediaElement sound.g3
-          C4 -> playMediaElement sound.c4
-          E4 -> playMediaElement sound.e4
-          G4 -> playMediaElement sound.g4
-          Nope -> playMediaElement sound.nope
-  in
-    ()
+initialiseSounds : Cmd msg
+initialiseSounds =
+  [G3, C4, E4, G4, Nope]
+    |> List.map (WebAudio.loadSound << soundUrl)
+    |> batch
 
-getMediaElement : String -> MediaElementAudioSourceNode
-getMediaElement soundFile =
-  createHiddenMediaElementAudioSourceNode WebAudio.DefaultContext
-    |> connectNodes (getDestinationNode DefaultContext) 0 0
-    |> setMediaElementSource soundFile
+playNote : Note -> Cmd msg
+playNote note =
+  note
+    |> soundUrl
+    |> WebAudio.playSound

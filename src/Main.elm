@@ -2,22 +2,23 @@ module Main exposing (..)
 
 import Array exposing (Array)
 import Html exposing (..)
-import Html.App as Html
+import Html.App
 import Html.Attributes exposing (..)
 import Task
 import Process
 import Time exposing (Time, second, millisecond)
 import Maybe
 import Random
+import Platform.Cmd exposing (batch)
 
 import Logo exposing (Colour(..))
-import Sound exposing (Sound)
+import Sound
 import Util
 
 main : Program Never
 main =
-  Html.program {
-    init = defaultState
+  Html.App.program {
+    init = initialState
     , view = renderModel
     , update = update
     , subscriptions = subscriptions }
@@ -41,20 +42,18 @@ type alias Model =
   , lightIndex : Int -- The index in the array of the current light
   , light : Colour --The colour to highlight
   , state : GameState
-  , sound : Sound
   , highscore : Int
   }
 
-defaultState : (Model, Cmd Msg)
-defaultState =
+initialState : (Model, Cmd Msg)
+initialState =
   ({ sequence = Array.empty
   , lightIndex = 0
   , light = Logo.None
   , state = Play
-  , sound = Sound.initialSound
   , highscore = 0
   }
-  , Random.generate NewGame (randomSequence 1))
+  , batch [Sound.initialiseSounds, (Random.generate NewGame (randomSequence 1))])
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model = gameLoop msg model
@@ -68,10 +67,10 @@ gameLoop msg model =
     Next ->
       let
         curLight = Maybe.withDefault Logo.None (Array.get model.lightIndex model.sequence)
-        _ = Sound.playNote (lightToNote curLight) model.sound
+        sound = Sound.playNote (lightToNote curLight)
       in
         ({ model | light = curLight, lightIndex = model.lightIndex + 1 }
-        , delay (millisecond * 500) Wait)
+        , batch [sound, delay (millisecond * 500) Wait])
     Wait ->
       if model.lightIndex < (Array.length model.sequence) then
         ({ model | light = Logo.None }, (delay (millisecond * 100) Next))
@@ -91,13 +90,14 @@ gameLoop msg model =
           guessedWrong =
             (0, Sound.Nope, GameOver)
 
-          (newIndex, sound, cmd) = if expectedColour == light then
-            guessedRight model light
-          else
-            guessedWrong
-          _ = Sound.playNote sound model.sound
+          (newIndex, note, cmd) = if expectedColour == light then
+              guessedRight model light
+            else
+              guessedWrong
+          sound = Sound.playNote note
         in
-          ({ model | light = light, lightIndex = newIndex }, delay (millisecond * 500) cmd)
+          ({ model | light = light, lightIndex = newIndex }
+          , batch [sound, delay (millisecond * 500) cmd])
       else
         (model, Cmd.none)
     NextColour colour ->
@@ -112,21 +112,21 @@ gameLoop msg model =
       let
         sequenceComplete = model.lightIndex == Array.length model.sequence
         cmd = if sequenceComplete then
-          Random.generate NextColour (Util.oneOf [Green, Yellow, Purple, Blue])
-        else
-          Cmd.none
+            Random.generate NextColour (Util.oneOf [Green, Yellow, Purple, Blue])
+          else
+            Cmd.none
 
         highscore = if sequenceComplete then
-          Basics.max model.highscore (Array.length model.sequence)
-        else
-          model.highscore
+            Basics.max model.highscore (Array.length model.sequence)
+          else
+            model.highscore
 
         --Only update the light colour if the model hasn't moved on
         --to the next index already
         light = if prevLightIndex >= model.lightIndex then
-          Logo.None
-        else
-          model.light
+            Logo.None
+          else
+            model.light
       in
         ({ model | light = light, highscore = highscore }, cmd)
     GameOver ->
@@ -155,7 +155,7 @@ renderModel model =
     [
     h1 [] [text "Simon Says"],
     p [] [text ("Highscore: " ++ (toString model.highscore))],
-    div [svgpanel] [Html.map logoMsgToMainMsg (Logo.logo model.light)]
+    div [svgpanel] [Html.App.map logoMsgToMainMsg (Logo.logo model.light)]
     ]
 
 logoMsgToMainMsg : Logo.Msg -> Msg
