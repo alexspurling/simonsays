@@ -7,7 +7,11 @@ Todo
 + Use an index to track which is the expected colour to wait for
 + Verify the correct colour was chosen
 + Create two Msg types for Logo and Main and use Html.App.map to map one to the other
++ start with a short sequence
++ if player guesses correctly, add to sequence
++ if player guesses incorrectly, start new game
++ Play sounds in an audio buffer
 
-- start with a short sequence
-- if player guesses correctly, add to sequence
-- if player guesses incorrctly, start new game
+- Create call back port to receive loaded sounds
+- Build with gulp
+- Use sound sprite sheet

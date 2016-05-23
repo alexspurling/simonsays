@@ -1,6 +1,8 @@
 var app = Elm.Main.fullscreen();
 
-var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+// Fix up prefixing
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var audioCtx = new AudioContext();
 
 var audioBuffers = {};
 
@@ -16,7 +18,7 @@ app.ports.loadSound.subscribe(function(url) {
     }, function(err) {
       console.log("Failed to load " + url, err);
     });
-  }
+  };
   request.send();
 });
 
