@@ -21,7 +21,7 @@ $ gulp build
 $ gulp serve
 ```
 
-Navigate to: https:localhost:3000/index.html (note I cannot use the Elm Reactor because I am using ports to play sounds)
+Navigate to: https://localhost:3000/index.html (note I cannot use the Elm Reactor because I am using ports to play sounds)
 
 [1]: http://www.elm-lang.org
 [2]: https://alexspurling.github.io/simonsays
