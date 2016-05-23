@@ -4,8 +4,6 @@ An implementation of the game Simon Says in [Elm 0.17][1]
 
 [Click here to play][2]
 
-[![SimonSays](simonsays.png)][2]
-
 # Build with npm and gulp
 
 [Install Elm][3]

@@ -1,1 +1,5 @@
 elm-stuff/
+build/
+.idea/
+#Used to deploy assets to gh-pages branch
+.publish/
