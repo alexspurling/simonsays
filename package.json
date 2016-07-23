@@ -1,5 +1,5 @@
 {
-  "name": "simon says",
+  "name": "simonsays",
   "version": "1.0.0",
   "description": "Simon Says game in Elm 0.17",
   "dependencies": {},

@@ -14,12 +14,15 @@ Download the code with git, then use npm and gulp to build the code:
 $ git clone https://github.com/alexspurling/simonsays.git
 $ cd simonsays
 $ npm install
-...Wait for a ton of dependencies to be downloaded
+### Wait for a ton of dependencies to be downloaded
+### Install the gulp cli (if you haven't already)
+$ sudo npm install --global gulp-cli
+### Build the project
 $ gulp build
 $ gulp serve
 ```
 
-Navigate to: [https://localhost:3000/index.html] (note I cannot use the Elm Reactor because I am using ports to play sounds)
+Navigate to: [http://localhost:3000/index.html] (note I cannot use the Elm Reactor because I am using ports to play sounds)
 
 [1]: http://www.elm-lang.org
 [2]: https://alexspurling.github.io/simonsays

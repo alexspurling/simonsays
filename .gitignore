@@ -3,3 +3,5 @@ build/
 .idea/
 #Used to deploy assets to gh-pages branch
 .publish/
+node_modules/
+*.iml
